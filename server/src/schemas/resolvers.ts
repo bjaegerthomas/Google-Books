@@ -2,7 +2,9 @@ import type IUserContext from '../interfaces/IUserContext';
 import type IUserDocument from '../interfaces/IUserDocument';
 import type IBookInput from '../interfaces/IBookInput';
 
-import { User } from '../models/index.js';
+import User from '../models/index.js';
+
+import axios from 'axios';
 import { signToken, AuthenticationError } from '../services/auth-service.js';
 
 const resolvers = {
@@ -14,9 +16,22 @@ const resolvers = {
                 return userData;
             }
             throw new AuthenticationError('You need to be logged in!');
-        }, 
-    },
-    Mutation: {
+        },
+        },
+        searchGoogleBooks: async (_parent: any, { query }: { query: string }): Promise<Array<IBookInput>> => {
+            const response = await axios.get(
+            `https://www.googleapis.com/books/v1/volumes?q=${query}`
+            );
+                return response.data.items.map((book: any) => ({
+                bookId: book.id,
+                authors: book.volumeInfo.authors,
+                description: book.volumeInfo.description,
+                title: book.volumeInfo.title,
+                image: book.volumeInfo.imageLinks?.thumbnail,
+                link: book.volumeInfo.infoLink,
+            }));
+        },
+        Mutation: {
         addUser: async (_parent: any, args: any): Promise<{ token: string; user: IUserDocument }> => {
             const user = await User.create(args);
             const token = signToken(user.username, user.email, user.id);
@@ -32,11 +47,11 @@ const resolvers = {
             const token = signToken(user.username, user.email, user.id);
             return { token, user };
         },
-        saveBook: async (_pasrent: any, { bookId }: { bookId: string}, context: IUserContext): Promise<IUserDocument | null> => {
+        saveBook: async (_pasrent: any, { bookData }: { bookData: IBookInput}, context: IUserContext): Promise<IUserDocument | null> => {
             if (context.user) {
                 const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
-                    { $push: { savedBooks: bookId } },
+                    { $push: { savedBooks: bookData} },
                     { new: true }
                 );
                 return updatedUser;

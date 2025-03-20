@@ -33,8 +33,10 @@ type BookInput {
 }
 
 type Query {
-  me: User
-}
+    me: User
+    searchGoogleBooks(query: String!): [Book]
+  }
+`;
 
 type Mutation {
   login(email: String!, password: String!): Auth
