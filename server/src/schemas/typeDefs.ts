@@ -28,6 +28,11 @@ type Book {
     link: String
     }
 
+type BookInput {
+    bookId: ID
+    title: String
+}
+
 type Query {
     users: [User]!
     user(username: String!): User
@@ -38,9 +43,8 @@ type Mutation {
   addUser(input: UserInput!): Auth
   login(email: String!, password: String!): Auth
 
-  addSkill(profileId: ID!, skill: String!): Profile
-  removeProfile: Profile
-  removeSkill(skill: String!): Profile
+  saveBook(username: String!, bookId: BookInput!): User
+  removeBook(username: String!, bookId: ID!): User
 }
 `;
 
