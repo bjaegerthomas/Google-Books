@@ -33,6 +33,7 @@ interface Context {
         username: string;
         email: string;
     }
+}
 
 const resolvers = {
     Query: {
