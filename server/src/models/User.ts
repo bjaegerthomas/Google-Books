@@ -1,16 +1,21 @@
 import { Schema, model, type Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-// import schema from Book.js
-import bookSchema from './Book.js';
-import type { BookDocument } from './Book.js';
+interface IBook extends Document {
+  bookId: string;
+  title: string;
+  authors: string[];
+  description: string;
+  image: string;
+  link: string;
+}
 
 interface IUser extends Document {
   _id: string;
   username: string;
   email: string;
   password: string;
-  savedBooks: BookDocument[];
+  savedBooks: IBook[];
   isCorrectPassword(password: string): Promise<boolean>;
   bookCount: number;
 }
@@ -32,8 +37,18 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
-    // set savedBooks to be an array of data that adheres to the bookSchema
-    savedBooks: [bookSchema],
+    savedBooks: {
+      type: [
+        {
+          bookId: { type: String, required: true },
+          title: { type: String, required: true },
+          authors: { type: [String], required: true },
+          description: { type: String },
+          image: { type: String },
+          link: { type: String },
+        },
+      ],
+    },
     bookCount: {
       type: Number,
       default: 0,
@@ -58,7 +73,7 @@ userSchema.pre<IUser>('save', async function (next) {
 });
 
 // custom method to compare and validate password for logging in
-profileSchema.methods.isCorrectPassword = async function (password: string): Promise<boolean> {
+userSchema.methods.isCorrectPassword = async function (password: string): Promise<boolean> {
   return bcrypt.compare(password, this.password);
 };
 
