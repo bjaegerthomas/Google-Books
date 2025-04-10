@@ -1,4 +1,4 @@
-import { Schema, model, type Document } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 interface IBook extends Document {
@@ -17,7 +17,7 @@ interface IUser extends Document {
   password: string;
   savedBooks: IBook[];
   isCorrectPassword(password: string): Promise<boolean>;
-  bookCount: number;
+  bookCount?: number;
 }
 
 const userSchema = new Schema<IUser>(

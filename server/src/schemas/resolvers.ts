@@ -1,4 +1,4 @@
-import User from '../models/index.js';
+import { User } from '../models/index.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
 
 interface User {
@@ -7,14 +7,7 @@ interface User {
     email: string;
     password: string;
     bookCount: number;
-    savedBooks: Array<{
-        bookId: string;
-        authors: string[];
-        description: string;
-        title: string;
-        image: string;
-        link: string;
-    }>;
+    savedBooks: string[];
 }
 
 interface UserInput {
@@ -28,11 +21,7 @@ interface BookInput {
 }
 
 interface Context {
-    user?: {
-        _id: string;
-        username: string;
-        email: string;
-    }
+    user?: User;
 }
 
 const resolvers = {
