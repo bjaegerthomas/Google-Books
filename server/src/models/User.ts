@@ -1,23 +1,14 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, type Document } from 'mongoose';
 import bcrypt from 'bcrypt';
-
-interface IBook extends Document {
-  bookId: string;
-  title: string;
-  authors: string[];
-  description: string;
-  image: string;
-  link: string;
-}
+import { type IBook, bookSchema } from './Book.js';
 
 interface IUser extends Document {
-  _id: string;
   username: string;
   email: string;
   password: string;
   savedBooks: IBook[];
   isCorrectPassword(password: string): Promise<boolean>;
-  bookCount?: number;
+  bookCount: number;
 }
 
 const userSchema = new Schema<IUser>(
@@ -37,22 +28,8 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
-    savedBooks: {
-      type: [
-        {
-          bookId: { type: String, required: true },
-          title: { type: String, required: true },
-          authors: { type: [String], required: true },
-          description: { type: String },
-          image: { type: String },
-          link: { type: String },
-        },
-      ],
-    },
-    bookCount: {
-      type: Number,
-      default: 0,
-    },
+    // set savedBooks to be an array of data that adheres to the bookSchema
+    savedBooks: [bookSchema],
   },
   // set this to use virtual below
   {
@@ -74,11 +51,11 @@ userSchema.pre<IUser>('save', async function (next) {
 
 // custom method to compare and validate password for logging in
 userSchema.methods.isCorrectPassword = async function (password: string): Promise<boolean> {
-  return bcrypt.compare(password, this.password);
+  return await bcrypt.compare(password, this.password);
 };
 
 // when we query a user, we'll also get another field called `bookCount` with the number of saved books we have
-userSchema.virtual('bookCount').get(function () {
+userSchema.virtual('bookCount').get(function (this: IUser) {
   return this.savedBooks.length;
 });
 
