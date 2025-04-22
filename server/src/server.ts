@@ -2,7 +2,6 @@ import express from 'express';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import path from 'node:path';
-import { fileURLToPath } from 'url';
 import { authenticateToken } from './services/auth-service.js';
 
 import { typeDefs, resolvers } from './schemas/index.js';
@@ -27,9 +26,6 @@ const startApolloServer = async () => {
         context: authenticateToken as any
       }
     ));
-
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
 
   if (process.env.NODE_ENV === 'production') {
     const staticPath = path.resolve(process.cwd(), 'client', 'dist');
