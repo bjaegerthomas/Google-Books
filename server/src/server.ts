@@ -32,10 +32,11 @@ const startApolloServer = async () => {
   const __dirname = path.dirname(__filename);
 
   if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/dist')));
+    const staticPath = path.resolve(process.cwd(), 'client', 'dist');
+    app.use(express.static(staticPath));
 
     app.get('*', (_req, res) => {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    res.sendFile(path.join(staticPath, 'index.html'));
     });
   }
 
