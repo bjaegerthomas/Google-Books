@@ -13,7 +13,7 @@ const resolvers = {
         const userData = await User.findOne({ _id: context.user._id }).select('-__v -password');
         return userData;
       }
-      throw new AuthenticationError('User not authenticated');
+      throw new Error('User not authenticated');
     },
   },
   Mutation: {
@@ -27,7 +27,7 @@ const resolvers = {
       const user = await User.findOne({ email });
 
       if (!user || !(await user.isCorrectPassword(password))) {
-        throw new AuthenticationError('Invalid credentials');
+        throw new Error('Invalid credentials');
       }
 
       const token = signToken(user.username, user.email, user._id);
@@ -44,7 +44,7 @@ const resolvers = {
         return updatedUser;
       }
 
-      throw new AuthenticationError('User not authenticated');
+      throw new Error('User not authenticated');
     },
     removeBook: async (_parent: any, { bookId }: { bookId: string }, context: IUserContext): Promise<IUserDocument | null> => {
       if (context.user) {
@@ -57,7 +57,7 @@ const resolvers = {
         return updatedUser;
       }
 
-      throw new AuthenticationError('User not authenticated');
+      throw new Error('User not authenticated');
     },
   },
 };
